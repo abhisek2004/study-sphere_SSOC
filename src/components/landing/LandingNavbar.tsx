@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { Sparkles, Menu, X } from "lucide-react"
 import { useState } from "react"
+import Image from "next/image"
 
-export default function LandingNavbar() {
+export default function LandingNavbar({ session }: { session?: { userId?: number; email?: string } }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -32,8 +33,14 @@ export default function LandingNavbar() {
               {/* Logo container */}
               <div className="relative flex items-center space-x-2 rounded-xl bg-background/80 backdrop-blur-sm px-4 py-2 border border-primary/30 shadow-lg">
                 <div className="relative">
-                  <Sparkles className="h-6 w-6 text-blue-400 animate-spin" style={{ animationDuration: '3s' }} />
-                  <div className="absolute inset-0 h-6 w-6 bg-blue-400 rounded-full blur-sm opacity-30 animate-ping"></div>
+                  <Image
+                    src="/study-sphere-logo1.png"
+                    alt="Study Sphere Logo"
+                    width={32}
+                    height={32}
+                    className="h-8 w-8"
+                  />
+                  <div className="absolute inset-0 h-8 w-8 bg-blue-400 rounded-full blur-sm opacity-30 animate-ping"></div>
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
                   Study Sphere
@@ -68,28 +75,23 @@ export default function LandingNavbar() {
 
         {/* Desktop CTA Buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Button variant="ghost" asChild className="relative group overflow-hidden">
-              <Link href="/dashboard" className="relative z-10">
-                <span className="relative z-10">Sign In</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </Link>
-            </Button>
-          </motion.div>
-
+          {/* Only show Sign In if not authenticated */}
+          {!session && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button variant="ghost" asChild className="relative group overflow-hidden">
+                <Link href="/auth/login" className="relative z-10">
+                  <span className="relative z-10">Sign In</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </Link>
+              </Button>
+            </motion.div>
+          )}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -97,13 +99,12 @@ export default function LandingNavbar() {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Button asChild className="relative group overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-0 shadow-lg shadow-blue-500/25 hover:shadow-purple-500/25 transition-all duration-300">
-              <Link href="/dashboard" className="relative z-10 flex items-center gap-2">
-                <span>Get Started</span>
+            <Button asChild className="relative group overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 border-0 shadow-lg shadow-blue-500/25 text-white transition-all duration-300 hover:from-blue-600 hover:to-purple-700">
+              <Link href={session ? "/dashboard" : "/auth/register"} className="relative z-10 flex items-center gap-2">
+                <span>{session ? "Dashboard" : "Get Started"}</span>
                 <Sparkles className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
-                
                 {/* Animated background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 group-hover:opacity-0 text-white transition-opacity duration-500"></div>
               </Link>
             </Button>
           </motion.div>
@@ -159,15 +160,17 @@ export default function LandingNavbar() {
           ))}
           
           <div className="pt-4 space-y-3">
-            
-            <Button variant="ghost" asChild className="w-full justify-start">
-              <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                Sign In
-              </Link>
-            </Button>
+            {/* Only show Sign In if not authenticated */}
+            {!session && (
+              <Button variant="ghost" asChild className="w-full justify-start">
+                <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+                  Sign In
+                </Link>
+              </Button>
+            )}
             <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-              <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                Get Started
+              <Link href={session ? "/dashboard" : "/auth/register"} onClick={() => setIsOpen(false)}>
+                {session ? "Dashboard" : "Get Started"}
               </Link>
             </Button>
           </div>

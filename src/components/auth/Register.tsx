@@ -1,39 +1,87 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { Eye, EyeOff } from 'lucide-react';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function Register() {
+  const checkPasswordStrength = useCallback((password: string) => {
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const lengthCheck = password.length >= 8;
+
+    if (lengthCheck && hasUpperCase && hasLowerCase && hasNumbers && hasSpecial) {
+      return 'Strong';
+    } else if (lengthCheck && ((hasUpperCase && hasLowerCase) || hasNumbers)) {
+      return 'Moderate';
+    } else {
+      return 'Weak';
+    }
+  }, []);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState('');
   const router = useRouter();
+
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? '';
+
+  useEffect(() => {
+    if (!siteKey) {
+      console.error('⚠️ Missing NEXT_PUBLIC_RECAPTCHA_SITE_KEY. reCAPTCHA will not work.');
+    }
+  }, [siteKey]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (password) {
+        const strength = checkPasswordStrength(password);
+        setPasswordStrength(strength);
+      }
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [password]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, name, recaptchaToken }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
         router.push('/dashboard');
         router.refresh();
       } else {
         setError(data.error || 'Registration failed');
+        recaptchaRef.current?.reset();
       }
     } catch (error) {
       setError('Network error');
+      recaptchaRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -47,7 +95,20 @@ export default function Register() {
       transition={{ duration: 0.5 }}
       className="bg-white p-8 shadow-xl rounded-2xl space-y-6"
     >
-      <h2 className="text-3xl font-bold text-center text-gray-800">Create an Account</h2>
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="flex justify-center">
+          <Image
+            src="/study-sphere-logo1.png"
+            alt="Study Sphere Logo"
+            width={64}
+            height={64}
+            className="h-16 w-16"
+          />
+        </div>
+        <h2 className="text-3xl font-bold text-gray-800">Create an Account</h2>
+        <p className="text-gray-600">Join Study Sphere today</p>
+      </div>
 
       {error && (
         <motion.div
@@ -59,6 +120,7 @@ export default function Register() {
         </motion.div>
       )}
 
+      {/* Name */}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
           Name
@@ -73,6 +135,7 @@ export default function Register() {
         />
       </div>
 
+      {/* Email */}
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Email
@@ -87,21 +150,54 @@ export default function Register() {
         />
       </div>
 
-      <div>
+      {/* Password */}
+      <div className="relative">
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
           Password
         </label>
         <input
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+          className="mt-1 block w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          aria-label="Toggle password visibility"
+          className="absolute right-3 top-9 text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+        </button>
+
+        {password && (
+          <p
+            className={`text-sm mt-1 ${
+              passwordStrength === 'Strong'
+                ? 'text-green-600'
+                : passwordStrength === 'Moderate'
+                ? 'text-yellow-600'
+                : 'text-red-600'
+            }`}
+          >
+            Strength: {passwordStrength}
+          </p>
+        )}
       </div>
 
+      {/* reCAPTCHA */}
+      {siteKey && (
+        <ReCAPTCHA
+          ref={recaptchaRef}
+          sitekey={siteKey}
+          onChange={(token) => setRecaptchaToken(token || '')}
+        />
+      )}
+
+      {/* Submit */}
       <button
         type="submit"
         disabled={loading}

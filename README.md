@@ -7,44 +7,34 @@
 
 ---
 
-### 🌟 About
+### About
 
-**Study Sphere** is an intelligent and versatile learning platform built to supercharge your study sessions. With a modern interface and powerful AI support, it offers an engaging and personalized educational experience through four core features:
 **Study Sphere** is an intelligent and versatile learning platform built to supercharge your study sessions. With a modern interface and powerful AI support, it offers an engaging and personalized educational experience through four core features:
 
 - 📝 **Notes**: Create, manage, and organize your study notes with ease.
 - ❓ **Quiz**: Challenge yourself with subject-specific quizzes and track your progress.
 - 🃏 **Flashcards Generator**: AI-powered flashcard creation from your study material for effective memorization.
-- 🃏 **Flashcards Generator**: AI-powered flashcard creation from your study material for effective memorization.
 - 🤖 **Study Buddy (AI Mentor)**: Get instant help, explanations, and guidance from your AI-powered learning assistant.
 
 Start your journey toward smarter studying with **Study Sphere** – where learning meets innovation.
 
-<p align="center">
+<!-- <p align="center">
   <a href="https://www.youtube.com/watch?v=a5dYdKVxN4k">
     <img src="http://i.ytimg.com/vi/a5dYdKVxN4k/hqdefault.jpg" alt="Study Sphere Demo Video" width="640"/>
   </a>
-</p>
+</p> -->
+
+---
+
+### ⚙️ Tech Stack
+
+**Next.js** • **Tailwind CSS** • **CopilotKit**
 
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-black?logo=next.js" alt="Next.js" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />  <img src="https://img.shields.io/badge/CopilotKit-🪁-black" alt="CopilotKit" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />  <img src="https://img.shields.io/badge/CopilotKit-🪁-black" alt="CopilotKit" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/CopilotKit-🪁-black" alt="CopilotKit" />
 </p>
-
-### ✨ New Feature: AI Flashcards Generator
-
-Transform your study material into interactive flashcards with the power of AI! The new flashcards generator:
-
-- 🧠 **AI-Powered**: Automatically creates question-answer pairs from your study material
-- ⚙️ **Customizable**: Choose number of cards, difficulty level, and focus areas
-- 🎯 **Interactive**: Flip cards, track progress, and mark your understanding
-- 📊 **Progress Tracking**: Monitor your performance and identify areas for improvement
-- 💾 **Export & Save**: Download flashcards for offline study
-
-**Perfect for**: Memorization, active recall, spaced repetition, and exam preparation.
-
-👉 [Read the complete Flashcards Feature Guide](FLASHCARDS.md)
 
 <details>
 <summary>📦 <strong>Set Up</strong></summary>
@@ -68,6 +58,8 @@ To get **Study Sphere** up and running locally, follow these steps:
 
    ```sh
    GROQ_API_KEY='YOUR API KEY HERE'
+   NEXT_PUBLIC_RECAPTCHA_SITE_KEY='your_recaptcha_site_key_here'
+   RECAPTCHA_SECRET_KEY='your_recaptcha_secret_key_here'
    ```
 
 4. **Run the development server:**
@@ -83,16 +75,22 @@ To get **Study Sphere** up and running locally, follow these steps:
   <p>It always takes time to understand and learn. So, don't worry at all. We know <b>you have got this</b>! 💪</p>
 </div>
 
+---
+
 <div>
   <h2><img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2764_fe0f/512.webp" width="35" height="35"> Show Your Support</h2>
 </div>
 
 If you find this project interesting and inspiring, please consider showing your support by starring it on GitHub! Your star goes a long way in helping us to reach more developers and encourages to keep enhancing the project.
 
+---
+
 <div>
   <h2><img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Memo.webp" alt="Memo" width="35" height="35" /> License</h2>
 </div>
 
 Study Sphere is licensed under the [MIT License](LICENSE). See the [LICENSE](LICENSE) file for more information.
+
+---
 
 <img src="https://media.giphy.com/media/LnQjpWaON8nhr21vNW/giphy.gif" width="60"> <em><b>I love connecting with different people</b>, so if you want to say <b>hi, I'll be happy to meet you more!</b> :)</em>

@@ -1,24 +1,46 @@
+// src/app/api/auth/register/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { hashPassword } from '@/lib/auth/password';
 import { setSession } from '@/lib/auth/jwt';
 import { eq } from 'drizzle-orm';
+import { verifyRecaptcha } from '@/lib/auth/recaptcha';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json();
-
-    // Validate input
-    if (!email || !password || !name) {
+    let body;
+    try {
+      body = await request.json();
+    } catch {
       return NextResponse.json(
-        { error: 'Email, password, and name are required' },
+        { error: 'Invalid JSON in request body' },
         { status: 400 }
       );
     }
 
-    // Check if user already exists
-    const existingUser = await db.select().from(users).where(eq(users.email, email));
+    const { email, password, name, recaptchaToken } = body;
+
+    if (!email || !password || !name || !recaptchaToken) {
+      return NextResponse.json(
+        { error: 'Email, password, name, and reCAPTCHA are required' },
+        { status: 400 }
+      );
+    }
+
+    const recaptchaRes = await verifyRecaptcha(recaptchaToken);
+    if (!recaptchaRes.success) {
+      return NextResponse.json(
+        { error: 'reCAPTCHA verification failed' },
+        { status: 403 }
+      );
+    }
+
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email));
+
     if (existingUser.length > 0) {
       return NextResponse.json(
         { error: 'User already exists' },
@@ -26,23 +48,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password and create user
     const hashedPassword = await hashPassword(password);
-    const newUser = await db.insert(users).values({
-      email,
-      password: hashedPassword,
-      name,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }).returning();
 
-    // Set session
-    await setSession(newUser[0].id, newUser[0].email);
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        email,
+        password: hashedPassword,
+        name,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
 
-    return NextResponse.json({
-      message: 'User created successfully',
-      user: { id: newUser[0].id, email: newUser[0].email, name: newUser[0].name }
-    });
+    await setSession(newUser.id, newUser.email);
+
+    return NextResponse.json(
+      {
+        message: 'User created successfully',
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+        },
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(

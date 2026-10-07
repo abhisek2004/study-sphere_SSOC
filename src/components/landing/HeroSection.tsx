@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import Spotlight from "@/components/ui/spotlight"
 import { motion } from "framer-motion"
 import { ArrowRight, Play } from "lucide-react"
+import Image from "next/image"
 
 export default function HeroSection() {
   return (    <section className="relative overflow-hidden py-24 lg:py-32">
@@ -24,7 +25,26 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="mx-auto max-w-4xl"
-        >          <motion.div
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8 flex justify-center"
+          >
+            <div className="relative">
+              <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 opacity-20 blur-xl animate-pulse"></div>
+              <Image
+                src="/study-sphere-logo1.png"
+                alt="Study Sphere Logo"
+                width={120}
+                height={120}
+                className="relative h-20 w-20 sm:h-24 sm:w-24 lg:h-30 lg:w-30"
+              />
+            </div>
+          </motion.div>
+
+          <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -65,7 +85,7 @@ export default function HeroSection() {
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-6 text-lg shadow-2xl shadow-blue-500/25 border-0"
             >
               <Link href="/dashboard" className="flex items-center gap-2">
-                Get Started Free
+                Get Started Free 
                 <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
